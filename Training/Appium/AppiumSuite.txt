@@ -1,0 +1,75 @@
+*** Settings ***
+Test Setup
+Library           AppiumLibrary
+Library           OperatingSystem
+Library           Process
+
+*** Variables ***
+${RemoteUrl}      http://127.0.0.1:4723/wd/hub
+&{DesiredCapabilities}    platformName=Android    platformVersion=4.3    deviceName=Android Emulator    app=${CURDIR}/base.apk    appPackage=anubhav.calculatorapp    appActivity=anubhav.calculatorapp.MainActivity    noReset=true
+${calculator_btn}    id=anubhav.calculatorapp:id/button1
+${scientific_calculator_button}    id=anubhav.calculatorapp:id/button
+${unit_converter_button}    id=anubhav.calculatorapp:id/button2
+
+*** Test Cases ***
+Validate Addition in Standard Calculator
+    [Tags]    1
+    [Setup]    openApplication
+    Navigate to Scientific Calculator
+    Validate Addition
+    [Teardown]    Go Back To Main Menu
+
+Validate Factorial in Scientific Calculator
+    [Tags]    2
+    Wait Until Page Contains Element    ${scientific_calculator_button}    timeout=60
+    Click Element    ${scientific_calculator_button}
+    Validate Factorial
+    [Teardown]    Go Back To Main Menu
+
+Validate Unit Converter
+    [Tags]    3
+    Wait Until Page Contains Element    ${unit_converter_button}    timeout=60
+    Click Element    ${unit_converter_button}
+    Validate Weight
+
+*** Keywords ***
+openApplication
+    Log Many    &{DesiredCapabilities}
+    AppiumLibrary.Open Application    ${RemoteUrl}    alias=None    &{DesiredCapabilities}
+
+startAppiumServer
+    ${output}=    Run    ${nodeAppiumBatch}
+    Log    ${output}
+
+Navigate to Scientific Calculator
+    Wait Until Page Contains Element    ${calculator_btn}    timeout=20
+    Click Element    ${calculator_btn}
+
+Validate Addition
+    Click Element    id=anubhav.calculatorapp:id/num8
+    Click Element    id=anubhav.calculatorapp:id/plus
+    Click Element    id=anubhav.calculatorapp:id/num9
+    Click Element    id=anubhav.calculatorapp:id/equal
+    ${val}=    Get Text    id=anubhav.calculatorapp:id/editText2
+    Should Contain    ${val}    17.0
+
+Validate Factorial
+    Wait Until Element Is Visible    id=anubhav.calculatorapp:id/num3
+    Click Element    id=anubhav.calculatorapp:id/num3
+    Click Element    id=anubhav.calculatorapp:id/factorial
+    ${val}=    Get Text    id=anubhav.calculatorapp:id/editText2
+    Should Contain    ${val}=    6
+
+Go Back To Main Menu
+    AppiumLibrary.Press Keycode    4
+
+Validate Weight
+    Wait Until Element Is Visible    id=anubhav.calculatorapp:id/weight
+    Click Element    id=anubhav.calculatorapp:id/weight
+    Wait Until Element Is Visible    anubhav.calculatorapp:id/item1
+    Click Element    anubhav.calculatorapp:id/num5
+    Click Element    anubhav.calculatorapp:id/spinner1
+    Click Element    name=Kilograms
+    Click Element    anubhav.calculatorapp:id/equal
+    ${val}=    Get Text    anubhav.calculatorapp:id/item2
+    Should Contain    ${val}    50000

@@ -1,0 +1,97 @@
+*** Settings ***
+Test Setup        openApplication
+Library           AppiumLibrary
+Library           OperatingSystem
+Library           Process
+
+*** Variables ***
+${RemoteUrl}      http://localhost:4723/wd/hub
+&{DesiredCapabilities}    platformName=Android    platformVersion=4.3    deviceName=Android Emulator    app=${CURDIR}/test.apk    appPackage=com.flipkart.android    appActivity=com.flipkart.android.SplashActivity    noReset=true
+${homepage_settings_btn}    id=com.flipkart.android:id/mainMenu
+${homepage_login_link}    name=Login
+${login_login_btn}    id=com.flipkart.android:id/btn_login
+${login_id}       id=com.flipkart.android:id/user_id
+${login_password}    id=com.flipkart.android:id/user_password
+${login_showPassword}    id=com.flipkart.android:id/show_password
+${login_skip}     id=com.flipkart.android:id/btn_skip
+${login_signup_btn}    id=com.flipkart.android:id/btn_signup
+${homepage_sideMenu}    id=android:id/up
+${homepage_logout_btn}    name=Logout
+${menu_dept_mobiles}    name=Mobiles
+${mobiles_allMobiles}    name=All Mobiles
+${mobiles_firstInList}    xpath=//android.widget.TextView[1]
+${mobiles_search_btn}    id=com.flipkart.android:id/search_icon
+${mobile_search_txtbox}    id=com.flipkart.android:id/autoCompleteTextView
+${search_autoComplete}    xpath=//android.widget.TextView
+${search_firstInSearchResult}    xpath=//android.widget.TextView
+${mobile_priceRange}    name=Rs. 5001 - Rs. 10000
+${mobile_brand}    name=Samsung
+${mobile_findTheRightMobileButton}    xpath=//android.widget.Button
+${mobile_samsungGalaxy}    name=Samsung Galaxy Core 2
+
+*** Test Cases ***
+LoginToFlipkartAndLogout
+    [Tags]    1
+    navigateToLoginPage
+    login    sarlakg@gmail.com    sarlakg12345
+    logout
+
+searchByMenu
+    [Tags]    2
+    Wait Until Page Contains Element    ${homepage_sideMenu}    timeout=60
+    Click Element    ${homepage_sideMenu}
+    Wait Until Page Contains Element    ${menu_dept_mobiles}    timeout=20
+    Click Element    ${menu_dept_mobiles}
+    Wait Until Page Contains Element    ${mobile_priceRange}    timeout=20
+    Click Element    ${mobile_priceRange}
+    Wait Until Page Contains Element    ${mobile_brand}    timeout=20
+    Click Element    ${mobile_brand}
+    Click Element    ${mobile_findTheRightMobileButton}
+    Wait Until Page Contains Element    ${mobile_samsungGalaxy}    timeout=20
+    Click Element    ${mobile_samsungGalaxy}
+
+searchBySearchBox
+    [Tags]    3
+    Wait Until Page Contains Element    ${homepage_sideMenu}    timeout=60
+    Click Element    ${homepage_sideMenu}
+    Click Element    ${menu_dept_mobiles}
+    Click Element    ${mobiles_search_btn}
+    Input Text    ${mobile_search_txtbox}    Lenovo A6000
+    Wait Until Page Contains Element    ${search_autoComplete}    timeout=60
+    Click Element    ${search_autoComplete}
+    Sleep    10s
+    Click Element    ${search_firstInSearchResult}
+
+*** Keywords ***
+openApplication
+    Log Many    &{DesiredCapabilities}
+    AppiumLibrary.Open Application    ${RemoteUrl}    alias=None    &{DesiredCapabilities}
+
+startAppiumServer
+    ${output}=    Run    ${nodeAppiumBatch}
+    Log    ${output}
+
+login
+    [Arguments]    ${id}    ${password}
+    Wait Until Page Contains Element    ${login_id}    timeout=60
+    Clear Text    ${login_id}
+    Input Text    ${login_id}    ${id}
+    Wait Until Page Contains Element    ${login_password}    timeout=60
+    Clear Text    ${login_password}
+    Input Password    ${login_password}    ${password}
+    Click Element    ${login_showPassword}
+    Click Element    ${login_login_btn}
+
+trySkip
+    Wait Until Page Contains Element    ${login_skip}    timeout=20
+    Click Element    ${login_skip}
+
+navigateToLoginPage
+    Wait Until Page Contains Element    ${homepage_settings_btn}    timeout=20
+    Click Element    ${homepage_settings_btn}
+    Click Element    ${homepage_login_link}
+
+logout
+    Wait Until Page Contains Element    ${homepage_settings_btn}    timeout=60
+    Click Element    ${homepage_settings_btn}
+    Click Element    ${homepage_logout_btn}
