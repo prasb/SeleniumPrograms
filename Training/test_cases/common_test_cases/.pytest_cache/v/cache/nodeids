@@ -1,0 +1,8 @@
+[
+  "test_cases_functional.py::test_if_page_is_accessible",
+  "test_cases_functional.py::test_for_correct_headers",
+  "test_cases_functional.py::test_add",
+  "test_cases_functional.py::test_minus",
+  "test_cases_functional.py::test_multiple",
+  "test_cases_functional.py::test_divide"
+]
